@@ -26,40 +26,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
+  const checkAdminRole = async (userId: string) => {
+    try {
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId);
+      setIsAdmin(data?.some((r) => r.role === "admin") ?? false);
+    } catch {
+      setIsAdmin(false);
+    }
+  };
+
   useEffect(() => {
+    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        setLoading(false);
 
+        // Check admin role asynchronously (don't block loading)
         if (session?.user) {
-          const { data } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", session.user.id);
-          setIsAdmin(data?.some((r) => r.role === "admin") ?? false);
+          checkAdminRole(session.user.id);
         } else {
           setIsAdmin(false);
         }
-
-        setLoading(false);
       }
     );
 
+    // Then check existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      setLoading(false);
 
       if (session?.user) {
-        supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", session.user.id)
-          .then(({ data }) => {
-            setIsAdmin(data?.some((r) => r.role === "admin") ?? false);
-          });
+        checkAdminRole(session.user.id);
       }
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -67,6 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    setIsAdmin(false);
   };
 
   return (
