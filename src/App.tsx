@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate, Outlet } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,8 +16,9 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function ProtectedRoute() {
   const { user, loading } = useAuth();
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -25,8 +26,12 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-  if (!user) return <Navigate to="/auth" replace />;
-  return <>{children}</>;
+
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  return <Outlet />;
 }
 
 const AppRoutes = () => (
@@ -35,11 +40,13 @@ const AppRoutes = () => (
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/auth" element={<AuthPage />} />
-      <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-      <Route path="/map" element={<ProtectedRoute><MapPage /></ProtectedRoute>} />
-      <Route path="/predictions" element={<ProtectedRoute><PredictionsPage /></ProtectedRoute>} />
-      <Route path="/alerts" element={<ProtectedRoute><AlertsPage /></ProtectedRoute>} />
-      <Route path="/devices" element={<ProtectedRoute><DevicesPage /></ProtectedRoute>} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/map" element={<MapPage />} />
+        <Route path="/predictions" element={<PredictionsPage />} />
+        <Route path="/alerts" element={<AlertsPage />} />
+        <Route path="/devices" element={<DevicesPage />} />
+      </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
   </>
