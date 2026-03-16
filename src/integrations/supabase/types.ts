@@ -14,16 +14,233 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      alerts: {
+        Row: {
+          created_at: string
+          device_id: string
+          id: string
+          message: string
+          parameter: string
+          resolved: boolean | null
+          severity: string
+          value: number | null
+        }
+        Insert: {
+          created_at?: string
+          device_id: string
+          id?: string
+          message: string
+          parameter: string
+          resolved?: boolean | null
+          severity: string
+          value?: number | null
+        }
+        Update: {
+          created_at?: string
+          device_id?: string
+          id?: string
+          message?: string
+          parameter?: string
+          resolved?: boolean | null
+          severity?: string
+          value?: number | null
+        }
+        Relationships: []
+      }
+      device_api_keys: {
+        Row: {
+          api_key: string
+          created_at: string
+          device_id: string
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+        }
+        Insert: {
+          api_key?: string
+          created_at?: string
+          device_id: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+        }
+        Update: {
+          api_key?: string
+          created_at?: string
+          device_id?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "device_api_keys_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "devices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      devices: {
+        Row: {
+          battery: number | null
+          created_at: string
+          created_by: string | null
+          device_id: string
+          device_name: string
+          firmware_version: string | null
+          id: string
+          installation_date: string | null
+          lake: string
+          last_seen: string | null
+          latitude: number
+          longitude: number
+          power_saving_mode: boolean | null
+          sampling_interval: number | null
+          signal_strength: number | null
+          status: string
+          transmission_interval: number | null
+          updated_at: string
+        }
+        Insert: {
+          battery?: number | null
+          created_at?: string
+          created_by?: string | null
+          device_id: string
+          device_name: string
+          firmware_version?: string | null
+          id?: string
+          installation_date?: string | null
+          lake: string
+          last_seen?: string | null
+          latitude: number
+          longitude: number
+          power_saving_mode?: boolean | null
+          sampling_interval?: number | null
+          signal_strength?: number | null
+          status?: string
+          transmission_interval?: number | null
+          updated_at?: string
+        }
+        Update: {
+          battery?: number | null
+          created_at?: string
+          created_by?: string | null
+          device_id?: string
+          device_name?: string
+          firmware_version?: string | null
+          id?: string
+          installation_date?: string | null
+          lake?: string
+          last_seen?: string | null
+          latitude?: number
+          longitude?: number
+          power_saving_mode?: boolean | null
+          sampling_interval?: number | null
+          signal_strength?: number | null
+          status?: string
+          transmission_interval?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          organization: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          organization?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          organization?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sensor_data: {
+        Row: {
+          battery: number | null
+          device_id: string
+          dissolved_oxygen: number | null
+          id: string
+          ph: number | null
+          recorded_at: string
+          signal_strength: number | null
+          temperature: number | null
+          turbidity: number | null
+        }
+        Insert: {
+          battery?: number | null
+          device_id: string
+          dissolved_oxygen?: number | null
+          id?: string
+          ph?: number | null
+          recorded_at?: string
+          signal_strength?: number | null
+          temperature?: number | null
+          turbidity?: number | null
+        }
+        Update: {
+          battery?: number | null
+          device_id?: string
+          dissolved_oxygen?: number | null
+          id?: string
+          ph?: number | null
+          recorded_at?: string
+          signal_strength?: number | null
+          temperature?: number | null
+          turbidity?: number | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "researcher" | "authority" | "viewer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +367,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "researcher", "authority", "viewer"],
+    },
   },
 } as const
