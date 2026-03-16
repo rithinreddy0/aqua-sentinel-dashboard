@@ -1,7 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Activity, Map, Brain, Bell, BarChart3, Cpu, Menu, X } from "lucide-react";
+import { Activity, Map, Brain, Bell, BarChart3, Cpu, Menu, X, LogIn, LogOut, User } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 const navItems = [
   { path: "/", label: "Home", icon: Activity },
@@ -15,6 +16,7 @@ const navItems = [
 export default function AppNavbar() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, signOut, isAdmin } = useAuth();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass-panel rounded-none border-x-0 border-t-0">
@@ -45,6 +47,36 @@ export default function AppNavbar() {
               </Link>
             );
           })}
+
+          <div className="ml-2 pl-2 border-l border-border flex items-center gap-2">
+            {user ? (
+              <>
+                {isAdmin && (
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                    ADMIN
+                  </span>
+                )}
+                <span className="text-xs text-muted-foreground hidden lg:block max-w-[120px] truncate">
+                  {user.email}
+                </span>
+                <button
+                  onClick={signOut}
+                  className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
+                  title="Sign out"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/auth"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:opacity-90 transition-all"
+              >
+                <LogIn className="h-3.5 w-3.5" />
+                Sign In
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* Mobile toggle */}
@@ -81,6 +113,24 @@ export default function AppNavbar() {
               </Link>
             );
           })}
+          {user ? (
+            <button
+              onClick={() => { signOut(); setMobileOpen(false); }}
+              className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent"
+            >
+              <LogOut className="h-4 w-4" />
+              Sign Out
+            </button>
+          ) : (
+            <Link
+              to="/auth"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium text-primary"
+            >
+              <LogIn className="h-4 w-4" />
+              Sign In
+            </Link>
+          )}
         </motion.div>
       )}
     </nav>
